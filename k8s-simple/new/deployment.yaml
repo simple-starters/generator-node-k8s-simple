@@ -1,0 +1,40 @@
+---
+actions:
+  to: kubernetes/app/deployment.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: {{artifactId}}
+  name: {{artifactId}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{artifactId}}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{artifactId}}
+    spec:
+      containers:
+      - image: {{artifactId}}:{{artifactVersion}}
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            path: /live
+            port: 3000
+        name: app
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          periodSeconds: 3
+          failureThreshold: 20
+          httpGet:
+            path: /health
+            port: 3000
+
+
+
